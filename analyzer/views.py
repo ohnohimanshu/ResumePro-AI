@@ -15,7 +15,7 @@ import io
 from docx.shared import Pt
 
 # Configure Gemini API Key with a supported model name
-genai.configure(api_key='AIzaSyDKuqEZcNm6B4gLy66XqHcSMq2sJTfz2ps')
+genai.configure(api_key='Your_API_Key')
 model = genai.GenerativeModel(model_name="models/text-bison-002")
 
 # List available models
