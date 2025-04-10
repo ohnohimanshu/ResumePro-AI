@@ -1,0 +1,34 @@
+{
+    "templates": [
+        {
+            "id": 1,
+            "name": "Modern Professional",
+            "category": "Professional",
+            "description": "Clean and modern design perfect for corporate roles",
+            "preview_url": "https://images.pexels.com/photos/442574/pexels-photo-442574.jpeg",
+            "features": ["ATS Friendly", "Modern Layout", "Professional Fonts"],
+            "color_scheme": ["#2563eb", "#1e40af"],
+            "download_url": "/static/templates/modern_professional.docx"
+        },
+        {
+            "id": 2,
+            "name": "Creative Portfolio",
+            "category": "Creative",
+            "description": "Stand out with this creative design for artistic roles",
+            "preview_url": "https://images.pexels.com/photos/1762851/pexels-photo-1762851.jpeg",
+            "features": ["Visual Focus", "Portfolio Section", "Custom Icons"],
+            "color_scheme": ["#ec4899", "#be185d"],
+            "download_url": "/static/templates/creative_portfolio.docx"
+        },
+        {
+            "id": 3,
+            "name": "Technical Expert",
+            "category": "Technical",
+            "description": "Optimized for technical and IT positions",
+            "preview_url": "https://images.pexels.com/photos/546819/pexels-photo-546819.jpeg",
+            "features": ["Skills Matrix", "Project Showcase", "Technical Focus"],
+            "color_scheme": ["#6366f1", "#4f46e5"],
+            "download_url": "/static/templates/technical_expert.docx"
+        }
+    ]
+}

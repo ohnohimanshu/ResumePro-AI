@@ -1,0 +1,230 @@
+{% load static %}
+{% load resume_filters %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Resume Analysis Results</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: #0F172A;
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+
+    .hero-pattern {
+      background-color: #0F172A;
+      background-image: radial-gradient(circle at center center, #1E293B 0%, transparent 25%),
+                        linear-gradient(to right, #1E293B, #1E293B);
+      background-size: 24px 24px;
+    }
+
+    .card-gradient {
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.9) 100%);
+    }
+
+    .feedback-section {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: slideIn 0.6s ease-out forwards;
+    }
+
+    @keyframes slideIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-title {
+      background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .prose-custom p {
+      color: #4a5568;
+      margin-bottom: 1rem;
+    }
+    .prose-custom ul {
+      list-style-type: none;
+      margin-left: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .prose-custom h2 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      color: #1a202c;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 0.5rem;
+    }
+    .feedback-section {
+      opacity: 0;
+      transform: translateY(20px);
+      @apply mb-8 p-6 bg-gray-50 rounded-lg;
+      border-radius: 1rem;
+      padding: 2rem;
+      background: linear-gradient(145deg, #ffffff, #f3f4f6);
+      box-shadow: 20px 20px 60px #d1d1d1, -20px -20px 60px #ffffff;
+    }
+    .section-title {
+      @apply text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200;
+      background: linear-gradient(to right, #4f46e5, #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      position: relative;
+    }
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(to right, #4f46e5, #7c3aed);
+      transition: width 0.3s ease;
+    }
+    .section-title:hover::after {
+      width: 100%;
+    }
+    .feedback-content {
+      color: #E2E8F0;
+      line-height: 1.8;
+      white-space: pre-line;
+    }
+    .feedback-list {
+      @apply space-y-3 mt-3;
+    }
+    .feedback-item {
+      @apply flex gap-3;
+    }
+    .feedback-number {
+      @apply text-indigo-600 font-semibold;
+    }
+    .bg-custom {
+      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+    }
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes slideIn {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    .slide-in {
+      animation: slideIn 0.6s ease-out forwards;
+    }
+    .feedback-visible {
+      animation: slideIn 0.6s ease-out forwards;
+    }
+    .glass-morphism {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+    .glass-card:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-5px);
+    }
+    .hover-lift {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .hover-lift:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.2);
+    }
+    .section-heading {
+      color: #818CF8;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #374151;
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+</head>
+<body class="hero-pattern min-h-screen text-gray-100">
+  <div class="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div class="w-full max-w-4xl animate-fade-in">
+      <div class="card-gradient backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-800">
+        <!-- Header -->
+        <div class="p-8 sm:p-10 border-b border-gray-800">
+          <h1 class="text-3xl sm:text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500">
+            Resume Analysis Results
+          </h1>
+          <p class="mt-2 text-center text-gray-400">
+            for {{ resume.name }}
+          </p>
+        </div>
+
+        <!-- Feedback Content -->
+        <div class="p-6 sm:p-8 lg:p-10">
+          <div class="feedback-content space-y-6">
+            {{ resume.feedback|safe|linebreaksbr }}
+          </div>
+
+          <!-- Action Button -->
+          <div class="mt-12 flex justify-center">
+            <a href="/" 
+              class="inline-flex items-center px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 shadow-lg">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"/>
+              </svg>
+              Analyze Another Resume
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Animate feedback sections on load
+    document.addEventListener('DOMContentLoaded', function() {
+      const sections = document.querySelectorAll('.feedback-section');
+      sections.forEach((section, index) => {
+        setTimeout(() => {
+          section.classList.add('feedback-visible');
+        }, index * 200);
+      });
+    });
+  </script>
+</body>
+</html>

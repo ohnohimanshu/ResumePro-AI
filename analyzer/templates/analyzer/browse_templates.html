@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resume Templates</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: #0F172A;
+        }
+
+        .template-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .template-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        .preview-image {
+            max-height: 200px;
+            object-fit: cover;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-100">
+    <div class="max-w-7xl mx-auto px-4 py-12">
+        <!-- Header -->
+        <div class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500">
+                Resume Templates
+            </h1>
+            <p class="mt-4 text-gray-400 text-lg">
+                Choose a template and download it.
+            </p>
+        </div>
+
+        <!-- Templates Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for template in templates %}
+            <div class="template-card bg-gray-800/50 backdrop-blur-xl rounded-2xl overflow-hidden border border-gray-700">
+                {% if template.preview_image %}
+                <img src="{{ template.preview_image.url }}" alt="{{ template.name }}" class="preview-image">
+                {% else %}
+                <img src="{% static 'placeholder.png' %}" alt="{{ template.name }}" class="preview-image">
+                {% endif %}
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-white mb-2">{{ template.name }}</h3>
+                    <p class="text-gray-400 mb-4">{{ template.description }}</p>
+
+                    <!-- Download Button -->
+                    <a href="{% url 'download_template' template.id %}" 
+                       class="block w-full text-center py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold transition-all duration-300 hover:opacity-90 hover:scale-105">
+                        Download Template
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Back Button -->
+        <div class="mt-12 text-center">
+            <a href="{% url 'home' %}" 
+               class="inline-flex items-center px-6 py-3 rounded-xl bg-gray-800 text-white font-semibold transition-all duration-300 hover:bg-gray-700">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Analyzer
+            </a>
+        </div>
+    </div>
+</body>
+</html>

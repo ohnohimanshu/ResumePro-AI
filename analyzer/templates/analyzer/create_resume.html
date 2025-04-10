@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Resume - {{ template.name }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: #0F172A;
+        }
+        .card-gradient {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.9) 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-100">
+    <div class="max-w-7xl mx-auto px-4 py-12">
+        <div class="card-gradient rounded-2xl p-8">
+            <h1 class="text-3xl font-bold mb-8">Create Resume using {{ template.name }}</h1>
+            
+            <form method="POST" class="space-y-6">
+                {% csrf_token %}
+                {% for section in template.sections %}
+                <div class="space-y-4">
+                    <h2 class="text-xl font-semibold text-indigo-400">{{ section }}</h2>
+                    <textarea 
+                        name="section_{{ forloop.counter }}" 
+                        class="w-full p-4 bg-gray-800 rounded-xl border border-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                        rows="4"
+                        placeholder="Enter your {{ section }} details"></textarea>
+                </div>
+                {% endfor %}
+                
+                <button type="submit" 
+                    class="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl font-semibold hover:opacity-90">
+                    Generate Resume
+                </button>
+            </form>
+            
+            <div class="mt-8">
+                <a href="{% url 'resume_templates' %}" 
+                   class="inline-flex items-center text-gray-400 hover:text-white">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Back to Templates
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resume Templates - OpenResume</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0F172A;
+        }
+
+        .template-card {
+            transition: all 0.3s ease;
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .template-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 30px -15px rgba(0, 0, 0, 0.3);
+        }
+
+        .preview-image {
+            transition: transform 0.3s ease;
+        }
+
+        .template-card:hover .preview-image {
+            transform: scale(1.05);
+        }
+
+        .feature-tag {
+            background: rgba(99, 102, 241, 0.1);
+            color: #818cf8;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-100">
+    <div class="max-w-7xl mx-auto px-4 py-12">
+        <!-- Header -->
+        <div class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500">
+                OpenResume Templates
+            </h1>
+            <p class="mt-4 text-gray-400 text-lg">
+                Professional resume templates powered by OpenResume
+            </p>
+        </div>
+
+        <!-- Templates Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for template in templates %}
+            <div class="template-card rounded-2xl overflow-hidden border border-gray-800">
+                <!-- Preview -->
+                <div class="relative aspect-[4/5] overflow-hidden bg-gray-900">
+                    <img src="{{ template.preview_url }}" 
+                         alt="{{ template.name }}" 
+                         class="preview-image w-full h-full object-cover object-top">
+                    <div class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-60"></div>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-white mb-2">{{ template.name }}</h3>
+                    <p class="text-gray-400 mb-4">{{ template.description }}</p>
+
+                    <!-- Features -->
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        {% for feature in template.features %}
+                        <span class="feature-tag px-3 py-1 rounded-full text-sm">
+                            {{ feature }}
+                        </span>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Sections Preview -->
+                    <div class="mb-6">
+                        <h4 class="text-sm font-medium text-gray-400 mb-2">Template Sections:</h4>
+                        <ul class="space-y-1 text-sm text-gray-500">
+                            {% for section in template.sections|slice:":3" %}
+                            <li class="flex items-center">
+                                <svg class="w-4 h-4 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                {{ section }}
+                            </li>
+                            {% endfor %}
+                            {% if template.sections|length > 3 %}
+                            <li class="text-gray-600">+ {{ template.sections|length|add:"-3" }} more sections</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+
+                    <!-- Use Template Button -->
+                    <a href="/create/{{ template.id }}" 
+                       class="block w-full text-center py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold transition-all duration-300 hover:opacity-90 hover:scale-[1.02]">
+                        Use Template
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Back Button -->
+        <div class="mt-12 text-center">
+            <a href="{% url 'home' %}" 
+               class="inline-flex items-center px-6 py-3 rounded-xl bg-gray-800 text-white font-semibold transition-all duration-300 hover:bg-gray-700">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Analyzer
+            </a>
+        </div>
+    </div>
+</body>
+</html>
