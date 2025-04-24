@@ -135,7 +135,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-GEMINI_API_KEY = 'AIzaSyDHPOc80cj4zNbRzJH7w5BwLBSEGOVOuAY'
+GEMINI_API_KEY = ''
 
 ALLOWED_MIME_TYPES = ['application/pdf', 'application/msword', 
                      'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
