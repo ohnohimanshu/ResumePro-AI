@@ -5,4 +5,4 @@ gunicorn>=21.2.0
 whitenoise>=6.5.0
 python-docx
 PyPDF2
-execptions
+# Removed misspelled package 'execptions'

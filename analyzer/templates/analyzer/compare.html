@@ -1,0 +1,265 @@
+{% extends 'analyzer/base.html' %}
+{% load static %}
+
+{% block title %}Compare Resumes - ResumePro AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .compare-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+        min-height: 100vh;
+    }
+
+    .comparison-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        animation: fadeInDown 0.8s ease-out;
+    }
+
+    .comparison-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .resume-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        height: 100%;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: slideUp 0.8s ease-out forwards;
+    }
+
+    .resume-panel.original {
+        animation-delay: 0.2s;
+    }
+
+    .resume-panel.optimized {
+        animation-delay: 0.4s;
+    }
+
+    .panel-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid rgba(99, 102, 241, 0.2);
+    }
+
+    .panel-header i {
+        font-size: 1.5rem;
+        margin-right: 0.75rem;
+    }
+
+    .panel-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .resume-content {
+        white-space: pre-wrap;
+        font-family: 'Space Grotesk', sans-serif;
+        line-height: 1.6;
+        color: #E2E8F0;
+        max-height: 600px;
+        overflow-y: auto;
+        padding-right: 1rem;
+    }
+
+    .resume-content::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .resume-content::-webkit-scrollbar-track {
+        background: rgba(99, 102, 241, 0.1);
+        border-radius: 4px;
+    }
+
+    .resume-content::-webkit-scrollbar-thumb {
+        background: rgba(99, 102, 241, 0.3);
+        border-radius: 4px;
+    }
+
+    .resume-content::-webkit-scrollbar-thumb:hover {
+        background: rgba(99, 102, 241, 0.5);
+    }
+
+    .changes-summary {
+        background: rgba(99, 102, 241, 0.1);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        opacity: 0;
+        animation: fadeIn 0.8s ease-out forwards 0.6s;
+    }
+
+    .changes-summary h3 {
+        color: #6366f1;
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .changes-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .changes-list li {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+        color: #E2E8F0;
+    }
+
+    .changes-list li i {
+        color: #6366f1;
+        margin-right: 0.5rem;
+        margin-top: 0.25rem;
+    }
+
+    .download-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 2rem;
+        opacity: 0;
+        animation: fadeIn 0.8s ease-out forwards 0.8s;
+    }
+
+    .download-btn {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .download-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .comparison-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .compare-container {
+            padding: 1rem;
+        }
+
+        .resume-panel {
+            padding: 1.5rem;
+        }
+    }
+
+    .highlight-add {
+        background-color: rgba(34, 197, 94, 0.2);
+        padding: 2px 0;
+    }
+
+    .highlight-remove {
+        background-color: rgba(239, 68, 68, 0.2);
+        text-decoration: line-through;
+        padding: 2px 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="compare-container">
+    <div class="comparison-header">
+        <h1 class="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
+            Resume Comparison
+        </h1>
+        <p class="text-xl text-gray-300">Compare your original and optimized resumes</p>
+    </div>
+
+    <div class="comparison-grid">
+        <div class="resume-panel original">
+            <div class="panel-header">
+                <i class="fas fa-file-alt text-indigo-400"></i>
+                <h2>Original Resume</h2>
+            </div>
+            <div class="resume-content">
+                {{ original_content|linebreaks }}
+            </div>
+        </div>
+
+        <div class="resume-panel optimized">
+            <div class="panel-header">
+                <i class="fas fa-star text-purple-400"></i>
+                <h2>Optimized Resume</h2>
+            </div>
+            <div class="resume-content">
+                {{ optimized_content|linebreaks }}
+            </div>
+        </div>
+    </div>
+
+    <div class="changes-summary">
+        <h3><i class="fas fa-list-check mr-2"></i>Key Changes Made</h3>
+        <ul class="changes-list">
+            {% for change in changes %}
+            <li>
+                <i class="fas fa-check-circle"></i>
+                <span>{{ change }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="download-buttons">
+        <a href="{% url 'download_original' resume.id %}" class="download-btn">
+            <i class="fas fa-download"></i>
+            Download Original
+        </a>
+        <a href="{% url 'download_optimized' resume.id %}" class="download-btn">
+            <i class="fas fa-file-arrow-down"></i>
+            Download Optimized
+        </a>
+    </div>
+</div>
+{% endblock %} 

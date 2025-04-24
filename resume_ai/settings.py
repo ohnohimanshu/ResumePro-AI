@@ -57,7 +57,10 @@ ROOT_URLCONF = 'resume_ai.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'analyzer/templates')],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'analyzer/templates'),
+            os.path.join(BASE_DIR, 'templates'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -132,4 +135,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-GEMINI_API_KEY = 'YOUR_API'
+GEMINI_API_KEY = 'AIzaSyDHPOc80cj4zNbRzJH7w5BwLBSEGOVOuAY'
+
+ALLOWED_MIME_TYPES = ['application/pdf', 'application/msword', 
+                     'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+
+# Configure upload directories
+RESUME_UPLOAD_DIR = 'resumes'
+OPTIMIZED_RESUME_DIR = 'optimized_resumes'

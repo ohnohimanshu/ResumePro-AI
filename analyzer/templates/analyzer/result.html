@@ -1,230 +1,397 @@
+{% extends 'analyzer/base.html' %}
 {% load static %}
-{% load resume_filters %}
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Resume Analysis Results</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+{% block title %}Resume Analysis Results{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+        --secondary-gradient: linear-gradient(135deg, #3b82f6, #10b981);
+        --accent-gradient: linear-gradient(135deg, #f59e0b, #ef4444);
+    }
 
     body {
-      font-family: 'Space Grotesk', sans-serif;
-      background: #0F172A;
-      -ms-overflow-style: none;  /* IE and Edge */
-      scrollbar-width: none;  /* Firefox */
+        font-family: 'Space Grotesk', sans-serif;
+        background: #0F172A;
+        color: #E2E8F0;
+        overflow-x: hidden;
     }
 
-    .hero-pattern {
-      background-color: #0F172A;
-      background-image: radial-gradient(circle at center center, #1E293B 0%, transparent 25%),
-                        linear-gradient(to right, #1E293B, #1E293B);
-      background-size: 24px 24px;
+    .result-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+        position: relative;
     }
 
-    .card-gradient {
-      background: linear-gradient(180deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.9) 100%);
+    /* Animated Background */
+    .animated-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background: radial-gradient(circle at center, #1E293B 0%, #0F172A 100%);
+        overflow: hidden;
     }
 
-    .feedback-section {
-      opacity: 0;
-      transform: translateY(20px);
-      animation: slideIn 0.6s ease-out forwards;
+    .animated-bg::before {
+        content: '';
+        position: absolute;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle at center, rgba(99, 102, 241, 0.1) 0%, transparent 50%);
+        animation: rotate 20s linear infinite;
     }
 
-    @keyframes slideIn {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
     }
 
-    .section-title {
-      background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    /* Score Display */
+    .score-display {
+        perspective: 1000px;
+        margin: 2rem 0;
     }
 
-    .prose-custom p {
-      color: #4a5568;
-      margin-bottom: 1rem;
+    .score-circle {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: var(--primary-gradient);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        box-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
+        position: relative;
+        transform-style: preserve-3d;
+        animation: float 6s ease-in-out infinite;
     }
-    .prose-custom ul {
-      list-style-type: none;
-      margin-left: 1.5rem;
-      margin-bottom: 1.5rem;
+
+    .score-circle::before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: var(--primary-gradient);
+        filter: blur(20px);
+        opacity: 0.5;
+        z-index: -1;
+        animation: pulse 2s ease-in-out infinite;
     }
-    .prose-custom h2 {
-      font-size: 1.5rem;
-      font-weight: bold;
-      margin-top: 2rem;
-      margin-bottom: 1rem;
-      color: #1a202c;
-      border-bottom: 2px solid #e2e8f0;
-      padding-bottom: 0.5rem;
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0) rotateX(0deg); }
+        50% { transform: translateY(-20px) rotateX(10deg); }
     }
-    .feedback-section {
-      opacity: 0;
-      transform: translateY(20px);
-      @apply mb-8 p-6 bg-gray-50 rounded-lg;
-      border-radius: 1rem;
-      padding: 2rem;
-      background: linear-gradient(145deg, #ffffff, #f3f4f6);
-      box-shadow: 20px 20px 60px #d1d1d1, -20px -20px 60px #ffffff;
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.5; }
+        50% { transform: scale(1.1); opacity: 0.3; }
     }
-    .section-title {
-      @apply text-xl font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200;
-      background: linear-gradient(to right, #4f46e5, #7c3aed);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      position: relative;
+
+    /* Analysis Sections */
+    .analysis-section {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transform-style: preserve-3d;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
     }
-    .section-title::after {
-      content: '';
-      position: absolute;
-      bottom: -5px;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: linear-gradient(to right, #4f46e5, #7c3aed);
-      transition: width 0.3s ease;
+
+    .analysis-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
     }
-    .section-title:hover::after {
-      width: 100%;
+
+    .analysis-section:hover::before {
+        transform: translateX(100%);
     }
-    .feedback-content {
-      color: #E2E8F0;
-      line-height: 1.8;
-      white-space: pre-line;
+
+    .analysis-section:hover {
+        transform: translateY(-10px) rotateX(5deg);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     }
-    .feedback-list {
-      @apply space-y-3 mt-3;
+
+    /* Cards */
+    .strength-card, .development-card, .recommendation-card {
+        background: rgba(30, 41, 59, 0.5);
+        border-radius: 15px;
+        padding: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
     }
-    .feedback-item {
-      @apply flex gap-3;
+
+    .strength-card::after, .development-card::after, .recommendation-card::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: var(--primary-gradient);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s ease;
     }
-    .feedback-number {
-      @apply text-indigo-600 font-semibold;
+
+    .strength-card:hover::after, .development-card:hover::after, .recommendation-card:hover::after {
+        transform: scaleX(1);
     }
-    .bg-custom {
-      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-      background-size: 400% 400%;
-      animation: gradient 15s ease infinite;
+
+    /* Keywords */
+    .keyword-tag {
+        background: rgba(99, 102, 241, 0.2);
+        color: #E2E8F0;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
     }
-    @keyframes gradient {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    @keyframes slideIn {
-      from {
-        transform: translateY(20px);
+
+    .keyword-tag::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--primary-gradient);
         opacity: 0;
-      }
-      to {
-        transform: translateY(0);
+        transition: opacity 0.3s ease;
+        z-index: -1;
+    }
+
+    .keyword-tag:hover::before {
         opacity: 1;
-      }
-    }
-    .slide-in {
-      animation: slideIn 0.6s ease-out forwards;
-    }
-    .feedback-visible {
-      animation: slideIn 0.6s ease-out forwards;
-    }
-    .glass-morphism {
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-    }
-    .glass-card {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      transition: all 0.3s ease;
-    }
-    .glass-card:hover {
-      background: rgba(255, 255, 255, 0.15);
-      transform: translateY(-5px);
-    }
-    .hover-lift {
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .hover-lift:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.2);
-    }
-    .section-heading {
-      color: #818CF8;
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid #374151;
     }
 
-    .animate-fade-in {
-      animation: fadeIn 0.5s ease-out forwards;
+    .keyword-tag:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* Download Buttons */
+    .download-btn {
+        position: relative;
+        overflow: hidden;
+        padding: 1rem 2rem;
+        border-radius: 10px;
+        text-decoration: none;
+        color: white;
+        background: var(--primary-gradient);
+        transition: all 0.3s ease;
+        border: none;
+        font-weight: 600;
+        letter-spacing: 1px;
     }
 
-    /* Hide scrollbar for Chrome, Safari and Opera */
-    ::-webkit-scrollbar {
-      display: none;
+    .download-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
     }
-  </style>
-</head>
-<body class="hero-pattern min-h-screen text-gray-100">
-  <div class="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8">
-    <div class="w-full max-w-4xl animate-fade-in">
-      <div class="card-gradient backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-800">
-        <!-- Header -->
-        <div class="p-8 sm:p-10 border-b border-gray-800">
-          <h1 class="text-3xl sm:text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500">
+
+    .download-btn:hover::before {
+        left: 100%;
+    }
+
+    .download-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+    }
+
+    /* Animations */
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px) rotateX(20deg);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) rotateX(0);
+        }
+    }
+
+    .animate-slide-up {
+        animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .result-container {
+            padding: 1rem;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+        }
+
+        .analysis-section {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="animated-bg"></div>
+<div class="result-container">
+    <div class="result-header animate-slide-up">
+        <h1 class="text-4xl font-bold text-center mb-8 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
             Resume Analysis Results
-          </h1>
-          <p class="mt-2 text-center text-gray-400">
-            for {{ resume.name }}
-          </p>
+        </h1>
+        <div class="score-display">
+            <div class="score-circle">
+                <span class="score text-5xl font-bold">{{ analysis.ats_score }}</span>
+                <span class="score-label text-lg">ATS Score</span>
+            </div>
         </div>
-
-        <!-- Feedback Content -->
-        <div class="p-6 sm:p-8 lg:p-10">
-          <div class="feedback-content space-y-6">
-            {{ resume.feedback|safe|linebreaksbr }}
-          </div>
-
-          <!-- Action Button -->
-          <div class="mt-12 flex justify-center">
-            <a href="/" 
-              class="inline-flex items-center px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 shadow-lg">
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"/>
-              </svg>
-              Analyze Another Resume
-            </a>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
 
-  <script>
-    // Animate feedback sections on load
+    <div class="result-content">
+        <!-- Executive Summary Section -->
+        <section class="analysis-section animate-slide-up" style="animation-delay: 0.2s">
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                <i class="fas fa-file-alt text-indigo-400"></i>
+                Executive Summary
+            </h2>
+            <div class="summary-card">
+                <p class="text-gray-300 leading-relaxed">{{ analysis.executive_summary }}</p>
+            </div>
+        </section>
+
+        <!-- Key Strengths Section -->
+        <section class="analysis-section animate-slide-up" style="animation-delay: 0.4s">
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                <i class="fas fa-star text-yellow-400"></i>
+                Key Strengths
+            </h2>
+            <div class="strengths-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for strength in analysis.key_strengths %}
+                <div class="strength-card">
+                    <h3 class="text-xl font-semibold text-indigo-300 mb-2">{{ strength.strength }}</h3>
+                    <p class="text-gray-400">{{ strength.evidence }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Development Areas Section -->
+        <section class="analysis-section animate-slide-up" style="animation-delay: 0.6s">
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                <i class="fas fa-chart-line text-blue-400"></i>
+                Development Areas
+            </h2>
+            <div class="development-grid grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% for area in analysis.development_areas %}
+                <div class="development-card">
+                    <h3 class="text-xl font-semibold text-blue-300 mb-2">{{ area.area }}</h3>
+                    <p class="text-gray-400">{{ area.recommendation }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Strategic Recommendations Section -->
+        <section class="analysis-section animate-slide-up" style="animation-delay: 0.8s">
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                <i class="fas fa-lightbulb text-yellow-400"></i>
+                Strategic Recommendations
+            </h2>
+            <div class="recommendations-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for rec in analysis.strategic_recommendations %}
+                <div class="recommendation-card">
+                    <h3 class="text-xl font-semibold text-yellow-300 mb-2">{{ rec.focus }}</h3>
+                    <p class="text-gray-400 mb-2"><span class="text-green-400">Action:</span> {{ rec.action }}</p>
+                    <p class="text-gray-400"><span class="text-blue-400">Benefit:</span> {{ rec.benefit }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Missing Keywords Section -->
+        <section class="analysis-section animate-slide-up" style="animation-delay: 1s">
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                <i class="fas fa-key text-purple-400"></i>
+                Missing Keywords
+            </h2>
+            <div class="keywords-container flex flex-wrap gap-2">
+                {% for keyword in analysis.missing_keywords %}
+                <span class="keyword-tag">{{ keyword }}</span>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Formatting Issues Section -->
+        <section class="analysis-section animate-slide-up" style="animation-delay: 1.2s">
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                <i class="fas fa-paint-brush text-pink-400"></i>
+                Formatting Issues
+            </h2>
+            <div class="formatting-list space-y-3">
+                {% for issue in analysis.formatting_issues %}
+                <div class="formatting-item flex items-center gap-3 p-3 bg-red-900/20 rounded-lg">
+                    <i class="fas fa-exclamation-circle text-red-400"></i>
+                    <p class="text-gray-300">{{ issue }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+     
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
     document.addEventListener('DOMContentLoaded', function() {
-      const sections = document.querySelectorAll('.feedback-section');
-      sections.forEach((section, index) => {
-        setTimeout(() => {
-          section.classList.add('feedback-visible');
-        }, index * 200);
-      });
+        // Add intersection observer for scroll animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-slide-up');
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+
+        document.querySelectorAll('.analysis-section').forEach(section => {
+            observer.observe(section);
+        });
     });
-  </script>
-</body>
-</html>
+</script>
+{% endblock %}
